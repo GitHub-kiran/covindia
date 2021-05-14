@@ -1,0 +1,12 @@
+[
+    {
+      "suiteName": "LCM",
+      "tests": "13",
+      "executions": "5",
+      "dif": "2",
+      "suc": "10",
+      "skip": "1",
+      "pct": "80%",
+      "hours": "3"
+    }
+  ]

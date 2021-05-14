@@ -1,0 +1,6 @@
+{
+    "/api": {
+      "target": "http://den01jpx.us.oracle.com:8080/",
+      "secure": false
+    }
+  }

@@ -1,0 +1,71 @@
+.show-data {
+    margin-left: 40px;
+    height: 40px;
+    width: 150px;
+    color: wheat;
+    background-color: darkcyan;
+    border-radius: 10px;
+    border-style: hidden;
+}
+
+.container {
+    margin-left: 20px;
+    margin-top: 30px;
+}
+#reports {
+    text-align: left;
+    padding-right: 1%;
+    background-color: whitesmoke;
+    
+}
+  
+  #reports td, #reports th {
+    border: 1px solid #ddd;
+    padding: 3px;
+  }
+  
+  #reports tr:nth-child(even){background-color: #f2f2f2;}
+  
+  #reports tr:hover {background-color: ghostwhite;}
+  
+  #reports th {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    text-align: left;
+    background-color: darkgrey;
+    color: black;
+    width: 90px;
+  }
+  
+  .get-zip-repo {
+    font-size: 14px;
+}
+
+.avg-time {
+  position:absolute;
+}
+h3 {
+  padding: 2%;
+}
+
+tbody {
+  font-size: 14px;
+}
+
+.rt {
+  padding-left: 2%;
+}
+
+.loading {
+  width: 100%;
+  padding-left: 10%;
+}
+
+.spinner {
+  height: 60px;
+  -o-object-fit: cover;
+  object-fit: cover;
+  padding-left: 35%;
+  padding-top: 5%;
+  padding-bottom: 5%;
+}

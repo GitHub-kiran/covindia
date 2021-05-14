@@ -1,0 +1,20 @@
+<div class="stats-container">
+  <!-- <div *ngIf="ociuiservice.isStats"> -->
+    <div *ngIf="ociuiservice.isStats" class="stats-container">
+        <div class="oci-stats stats-container" style="display: block"> 
+            <canvas baseChart 
+              [data]="pieChartData" 
+              [labels]="pieChartLabels" 
+              [chartType]="pieChartType"
+              [options]="pieChartOptions"
+              [plugins]="pieChartPlugins"
+              [colors]="pieChartColors"
+              [legend]="pieChartLegend">
+            </canvas>
+          </div>
+    </div>
+    <div *ngIf="ociuiservice.isBuild && !ociuiservice.isStats" ociuiBuild id="build" class="stats-container bld">
+      <!-- <iframe src="{{ociuiservice.buildUrlHtml}}"></iframe> -->
+      <!-- <div (include)="ociuiservice.buildUrlHtml"></div> -->
+    </div>
+</div>

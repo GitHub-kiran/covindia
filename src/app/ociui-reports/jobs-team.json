@@ -1,0 +1,90 @@
+    [
+      {
+      "id": 1,
+      "suiteName": "LCM",
+      "tests": "36",
+      "executions": "10",
+      "dif": "5",
+      "suc": "30",
+      "skip": "1",
+      "pct": "80%",
+      "hours": "2"
+    },
+    {
+      "id": 1,
+      "suiteName": "RENAME",
+      "tests": "15",
+      "executions": "7",
+      "dif": "1",
+      "suc": "14",
+      "skip": "0",
+      "pct": "95%",
+      "hours": "0.5"
+    },
+    {
+      "id": 1,
+      "suiteName": "ADG",
+      "tests": "20",
+      "executions": "12",
+      "dif": "2",
+      "suc": "18",
+      "skip": "0",
+      "pct": "90%",
+      "hours": "1"
+    },
+    {
+      "id": 1,
+      "suiteName": "CLONE",
+      "tests": "10",
+      "executions": "5",
+      "dif": "0",
+      "suc": "10",
+      "skip": "0",
+      "pct": "100%",
+      "hours": "3"
+    },
+    {
+      "id": 3,
+      "suiteName": "BACKUP",
+      "tests": "21",
+      "executions": "5",
+      "dif": "0",
+      "suc": "20",
+      "skip": "1",
+      "pct": "100%",
+      "hours": "0.5"
+    },
+    {
+      "id": 2,
+      "suiteName": "AJD",
+      "tests": "30",
+      "executions": "5",
+      "dif": "3",
+      "suc": "25",
+      "skip": "2",
+      "pct": "85%",
+      "hours": "1"
+    },
+    {
+      "id": 4,
+      "suiteName": "READ ONLY RESTRICTED",
+      "tests": "25",
+      "executions": "5",
+      "dif": "3",
+      "suc": "22",
+      "skip": "0",
+      "pct": "90%",
+      "hours": "1.5"
+    },
+    {
+      "id": 4,
+      "suiteName": "APEX",
+      "tests": "31",
+      "executions": "5",
+      "dif": "0",
+      "suc": "30",
+      "skip": "1",
+      "pct": "100%",
+      "hours": "1"
+    }
+  ]
