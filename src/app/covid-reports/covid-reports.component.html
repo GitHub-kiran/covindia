@@ -1,0 +1,77 @@
+<form id="reports" class="reports">
+  <div class="reports">
+    <p>Country Name: {{this.covidservice.countryName}} </p>
+    <p>  Population : {{this.covidservice.population}} </p>
+
+    <!-- <div *ngIf="isSingleCountry" class="rt">Job Name : {{this.covidservice.suiteName}}  -->
+      <!-- <div class="avg-time" *ngIf="this.covidservice.avg_time && isSingleCountry">Avg Execution Time : {{ this.covidservice.avg_time }}</div> -->
+    <!-- </div> -->
+    <div *ngIf="singleCountry" class="container">
+        <table id="reports" class="table table-striped">
+          <thead>
+              <tr>
+                <!-- <th>country</th> -->
+                <th>cases</th>
+                <th>deaths</th>
+                <th>recovered</th>
+                <th>serious</th>
+              </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let con of singleCountry">
+              <!-- <td>
+                <a class="get-zip-repo" (click)="showBuildUrlPage(rep.build_url)" >#{{rep.build_no}}</a>
+              </td> -->
+              <!-- <td>{{ covidservice.countryName }}</td> -->
+              <td>{{ con.cases }}</td>
+              <td>{{ con.deaths }}</td>
+              <td>{{ con.recovered }}</td>
+              <td>{{ con.serious }}</td>
+              <!-- <td>{{ con.population }}</td> -->
+              <!-- <td> -->
+                <!-- <a class="get-zip-repo" target="_blank" href="{{ rep.report_url }}">Download</a> -->
+              <!-- </td> -->
+            <!-- </tr> -->
+          </tbody>
+        </table>
+        <div class="loading" *ngIf="!singleCountry">
+          <div class="wrapper">
+              <img src="assets/spinner.gif" class="spinner">
+          </div>
+        </div>
+      </div>
+  
+      <div *ngIf="!singleCountry" class="container">
+        <table id="reports" class="table table-striped">
+          <thead>
+              <tr>
+                <th>country</th>
+                <th>cases</th>
+                <!-- <th>total deaths</th>
+                <th>serious</th>
+                <th>recovered</th>
+                <th>population</th> -->
+              </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let rep of report">
+              <!-- <td>
+                <a class="get-zip-repo" (click)="switchToJob(rep.suiteName)" href="">{{rep.suiteName}}</a>
+              </td> -->
+              <td>{{ rep.name }}</td>
+              <td>{{ rep.cases }}</td>
+              <!-- <td>{{ rep.deaths }}</td>
+              <td>{{ rep.serious }}</td>
+              <td>{{ rep.recovered }}</td>
+              <td>{{ rep.population }}</td> -->
+            </tr>
+          </tbody>
+        </table>
+        <div class="loading" *ngIf="!singleCountry">
+          <div class="wrapper">
+              <img src="assets/spinner.gif" class="spinner">
+          </div>
+        </div>
+      </div>  
+    </div>
+  </form>

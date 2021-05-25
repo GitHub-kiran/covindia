@@ -1,0 +1,843 @@
+{
+    "Description": "Core stack, used to deploy Web App resources to account and region",
+    "Parameters": {
+        "DeploymentCloudType": {
+            "Description": "Defines the cloud deployment type. i.e. 'dev', 'trials', 'gov-ca' or 'public",
+            "Type": "String",
+            "Default": "dev"
+        },
+        "WebAppVanityName": {
+            "Description": "Defines the outside facing name of the application, this is designed to be changable over time in case marketing renames a product",
+            "Type": "String",
+            "AllowedPattern": "^[a-z]*$",
+            "ConstraintDescription": "Vanity name must be all lower case with no dots or dashes"
+        },
+        "WebAppName": {
+            "Description": "Defines the internal naming of an application, unlikely to ever change, ie. remains the product codename like 'bluebird', 'griffon', 'raven' etc. ",
+            "Type": "String",
+            "AllowedPattern": "^[a-z]*$",
+            "ConstraintDescription": "Web app name must be all lower case with no dots or dashes"
+        }
+    },
+    "Conditions": {
+        "IsPublicCloud": {
+            "Fn::Equals": [
+                {
+                    "Ref": "DeploymentCloudType"
+                },
+                "public"
+            ]
+        }
+    },
+    "Resources": {
+        "WebCert": {
+            "Type": "AWS::CertificateManager::Certificate",
+            "Properties": {
+                "DomainName": {
+                    "Fn::If": [
+                        "IsPublicCloud",
+                        {
+                            "Fn::Sub": "${WebAppVanityName}.mitel.io"
+                        },
+                        {
+                            "Fn::Sub": "${WebAppVanityName}.${DeploymentCloudType}.mitel.io"
+                        }
+                    ]
+                },
+                "DomainValidationOptions": [
+                    {
+                        "DomainName": {
+                            "Fn::If": [
+                                "IsPublicCloud",
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}.mitel.io"
+                                },
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}.${DeploymentCloudType}.mitel.io"
+                                }
+                            ]
+                        },
+                        "ValidationDomain": "mitel.io"
+                    },
+                    {
+                        "DomainName": {
+                            "Fn::If": [
+                                "IsPublicCloud",
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}-stage.mitel.io"
+                                },
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}-stage.${DeploymentCloudType}.mitel.io"
+                                }
+                            ]
+                        },
+                        "ValidationDomain": "mitel.io"
+                    },
+                    {
+                        "DomainName": {
+                            "Fn::If": [
+                                "IsPublicCloud",
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}.talkify.com"
+                                },
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}.${DeploymentCloudType}.talkify.com"
+                                }
+                            ]
+                        },
+                        "ValidationDomain": "talkify.com"
+                    },
+                    {
+                        "DomainName": {
+                            "Fn::If": [
+                                "IsPublicCloud",
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}-stage.talkify.com"
+                                },
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}-stage.${DeploymentCloudType}.talkify.com"
+                                }
+                            ]
+                        },
+                        "ValidationDomain": "talkify.com"
+                    }
+                ],
+                "SubjectAlternativeNames": [
+                    {
+                        "Fn::If": [
+                            "IsPublicCloud",
+                            {
+                                "Fn::Sub": "${WebAppVanityName}-stage.mitel.io"
+                            },
+                            {
+                                "Fn::Sub": "${WebAppVanityName}-stage.${DeploymentCloudType}.mitel.io"
+                            }
+                        ]
+                    },
+                    {
+                        "Fn::If": [
+                            "IsPublicCloud",
+                            {
+                                "Fn::Sub": "${WebAppVanityName}.talkify.com"
+                            },
+                            {
+                                "Fn::Sub": "${WebAppVanityName}.${DeploymentCloudType}.talkify.com"
+                            }
+                        ]
+                    },
+                    {
+                        "Fn::If": [
+                            "IsPublicCloud",
+                            {
+                                "Fn::Sub": "${WebAppVanityName}-stage.talkify.com"
+                            },
+                            {
+                                "Fn::Sub": "${WebAppVanityName}-stage.${DeploymentCloudType}.talkify.com"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "DeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Sub": "${WebAppName}-deployment-${AWS::Region}-${AWS::AccountId}"
+                },
+                "BucketEncryption": {
+                    "ServerSideEncryptionConfiguration": [
+                        {
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "BlueBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Sub": "${WebAppName}-blue-${AWS::Region}-${AWS::AccountId}"
+                },
+                "BucketEncryption": {
+                    "ServerSideEncryptionConfiguration": [
+                        {
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "BlueBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "DependsOn": [
+                "BlueBucket",
+                "OriginAccessId"
+            ],
+            "Properties": {
+                "Bucket": {
+                    "Fn::Sub": "${WebAppName}-blue-${AWS::Region}-${AWS::AccountId}"
+                },
+                "PolicyDocument": {
+                    "Version": "2008-10-17",
+                    "Id": "PolicyForCloudFrontPrivateContent",
+                    "Statement": [
+                        {
+                            "Sid": "AllowOaiAccess",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "CanonicalUser": {
+                                    "Fn::GetAtt": [
+                                        "OriginAccessId",
+                                        "S3CanonicalUserId"
+                                    ]
+                                }
+                            },
+                            "Action": "s3:GetObject",
+                            "Resource": {
+                                "Fn::Sub": "arn:aws:s3:::${WebAppName}-blue-${AWS::Region}-${AWS::AccountId}/*"
+                            }
+                        },
+                        {
+                            "Sid": "AllowCICDToSyncBucket",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "AWS": {
+                                    "Fn::Sub": [
+                                        "arn:aws:iam::${CICDAccount}:root",
+                                        {
+                                            "CICDAccount": {
+                                                "Fn::ImportValue": "CICDAccountId"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "Action": [
+                                "s3:DeleteObject",
+                                "s3:GetBucketLocation",
+                                "s3:GetObject",
+                                "s3:ListBucket",
+                                "s3:PutObject",
+                                "s3:PutObjectAcl"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "arn:aws:s3:::${WebAppName}-blue-${AWS::Region}-${AWS::AccountId}/*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:s3:::${WebAppName}-blue-${AWS::Region}-${AWS::AccountId}"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "GreenBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Sub": "${WebAppName}-green-${AWS::Region}-${AWS::AccountId}"
+                },
+                "BucketEncryption": {
+                    "ServerSideEncryptionConfiguration": [
+                        {
+                            "ServerSideEncryptionByDefault": {
+                                "SSEAlgorithm": "AES256"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "GreenBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "DependsOn": [
+                "GreenBucket",
+                "OriginAccessId"
+            ],
+            "Properties": {
+                "Bucket": {
+                    "Fn::Sub": "${WebAppName}-green-${AWS::Region}-${AWS::AccountId}"
+                },
+                "PolicyDocument": {
+                    "Version": "2008-10-17",
+                    "Id": "PolicyForCloudFrontPrivateContent",
+                    "Statement": [
+                        {
+                            "Sid": "AllowOaiAccess",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "CanonicalUser": {
+                                    "Fn::GetAtt": [
+                                        "OriginAccessId",
+                                        "S3CanonicalUserId"
+                                    ]
+                                }
+                            },
+                            "Action": "s3:GetObject",
+                            "Resource": {
+                                "Fn::Sub": "arn:aws:s3:::${WebAppName}-green-${AWS::Region}-${AWS::AccountId}/*"
+                            }
+                        },
+                        {
+                            "Sid": "AllowCICDToSyncBucket",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "AWS": {
+                                    "Fn::Sub": [
+                                        "arn:aws:iam::${CICDAccount}:root",
+                                        {
+                                            "CICDAccount": {
+                                                "Fn::ImportValue": "CICDAccountId"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "Action": [
+                                "s3:DeleteObject",
+                                "s3:GetBucketLocation",
+                                "s3:GetObject",
+                                "s3:ListBucket",
+                                "s3:PutObject",
+                                "s3:PutObjectAcl"
+                            ],
+                            "Resource": [
+                                {
+                                    "Fn::Sub": "arn:aws:s3:::${WebAppName}-green-${AWS::Region}-${AWS::AccountId}/*"
+                                },
+                                {
+                                    "Fn::Sub": "arn:aws:s3:::${WebAppName}-green-${AWS::Region}-${AWS::AccountId}"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "EdgeLambdaExecutionRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Sub": "platform-${WebAppName}-edge-lambda"
+                },
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com",
+                                    "edgelambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyName": "root",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "logs:CreateLogGroup",
+                                        "logs:CreateLogStream",
+                                        "logs:PutLogEvents",
+                                        "logs:PutMetricFilter",
+                                        "logs:PutRetentionPolicy"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Sub": "arn:aws:logs:*:${AWS::AccountId}:*:log-stream:*"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "EdgeLambda": {
+            "Type": "AWS::Lambda::Function",
+            "DependsOn": "EdgeLambdaExecutionRole",
+            "Properties": {
+                "Code": {
+                    "ZipFile": {
+                        "Fn::Join": [
+                            "\n",
+                            [
+                                "exports.handler = function(event, context) {",
+                                "  console.log('hello world!');",
+                                "};"
+                            ]
+                        ]
+                    }
+                },
+                "FunctionName": {
+                    "Fn::Sub": "platform-${WebAppName}-edge-lambda"
+                },
+                "Handler": "index.handler",
+                "MemorySize": 128,
+                "Description": "Responsible for determining the appropriate target bucket for blue/green of CloudFront fronted Web Apps",
+                "Role": {
+                    "Fn::GetAtt": [
+                        "EdgeLambdaExecutionRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "nodejs8.10",
+                "Timeout": 5
+            }
+        },
+        "OriginAccessId": {
+            "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+            "Properties": {
+                "CloudFrontOriginAccessIdentityConfig": {
+                    "Comment": {
+                        "Fn::Sub": "${WebAppName}-${AWS::Region}-${AWS::AccountId}"
+                    }
+                }
+            }
+        },
+        "LiveCloudFrontDistro": {
+            "Type": "AWS::CloudFront::Distribution",
+            "DependsOn": [
+                "OriginAccessId",
+                "GreenBucket",
+                "BlueBucket",
+                "WebCert"
+            ],
+            "Properties": {
+                "DistributionConfig": {
+                    "Aliases": [
+                        {
+                            "Fn::If": [
+                                "IsPublicCloud",
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}.mitel.io"
+                                },
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}.${DeploymentCloudType}.mitel.io"
+                                }
+                            ]
+                        },
+                        {
+                            "Fn::If": [
+                                "IsPublicCloud",
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}.talkify.com"
+                                },
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}.${DeploymentCloudType}.talkify.com"
+                                }
+                            ]
+                        }
+                    ],
+                    "IPV6Enabled": true,
+                    "DefaultRootObject": "index.html",
+                    "PriceClass": "PriceClass_100",
+                    "Enabled": true,
+                    "HttpVersion":"http2",
+                    "Origins": [
+                        {
+                            "DomainName": {
+                                "Fn::GetAtt": [
+                                    "GreenBucket",
+                                    "DomainName"
+                                ]
+                            },
+                            "Id": {
+                                "Fn::Sub": "S3-${WebAppName}-green-${AWS::Region}-${AWS::AccountId}"
+                            },
+                            "S3OriginConfig": {
+                                "OriginAccessIdentity": {
+                                    "Fn::Sub": "origin-access-identity/cloudfront/${OriginAccessId}"
+                                }
+                            }
+                        },
+                        {
+                            "DomainName": {
+                                "Fn::GetAtt": [
+                                    "BlueBucket",
+                                    "DomainName"
+                                ]
+                            },
+                            "Id": {
+                                "Fn::Sub": "S3-${WebAppName}-blue-${AWS::Region}-${AWS::AccountId}"
+                            },
+                            "S3OriginConfig": {
+                                "OriginAccessIdentity": {
+                                    "Fn::Sub": "origin-access-identity/cloudfront/${OriginAccessId}"
+                                }
+                            }
+                        }
+                    ],
+                    "DefaultCacheBehavior": {
+                        "TargetOriginId": {
+                            "Fn::Sub": "S3-${WebAppName}-green-${AWS::Region}-${AWS::AccountId}"
+                        },
+                        "ViewerProtocolPolicy": "redirect-to-https",
+                        "ForwardedValues": {
+                            "QueryString": true
+                        },
+                        "MaxTTL": 31536000,
+                        "SmoothStreaming": false,
+                        "DefaultTTL": 86400,
+                        "AllowedMethods": [
+                            "HEAD",
+                            "DELETE",
+                            "POST",
+                            "GET",
+                            "OPTIONS",
+                            "PUT",
+                            "PATCH"
+                        ],
+                        "CachedMethods": [
+                            "HEAD",
+                            "GET"
+                        ],
+                        "MinTTL": 0,
+                        "Compress": true
+                    },
+                    "ViewerCertificate": {
+                        "SslSupportMethod": "sni-only",
+                        "AcmCertificateArn": {
+                            "Ref": "WebCert"
+                        }
+                    },
+                    "CustomErrorResponses": [
+                        {
+                            "ErrorCode": 403,
+                            "ResponsePagePath": "/index.html",
+                            "ResponseCode": 200,
+                            "ErrorCachingMinTTL": 5
+                        }
+                    ]
+                }
+            }
+        },
+        "StagingCloudFrontDistro": {
+            "Type": "AWS::CloudFront::Distribution",
+            "DependsOn": [
+                "OriginAccessId",
+                "GreenBucket",
+                "BlueBucket",
+                "WebCert"
+            ],
+            "Properties": {
+                "DistributionConfig": {
+                    "Aliases": [
+                        {
+                            "Fn::If": [
+                                "IsPublicCloud",
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}-stage.mitel.io"
+                                },
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}-stage.${DeploymentCloudType}.mitel.io"
+                                }
+                            ]
+                        },
+                        {
+                            "Fn::If": [
+                                "IsPublicCloud",
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}-stage.talkify.com"
+                                },
+                                {
+                                    "Fn::Sub": "${WebAppVanityName}-stage.${DeploymentCloudType}.talkify.com"
+                                }
+                            ]
+                        }
+                    ],
+                    "IPV6Enabled": true,
+                    "DefaultRootObject": "index.html",
+                    "PriceClass": "PriceClass_100",
+                    "Enabled": true,
+                    "HttpVersion":"http2",
+                    "Origins": [
+                        {
+                            "DomainName": {
+                                "Fn::GetAtt": [
+                                    "GreenBucket",
+                                    "DomainName"
+                                ]
+                            },
+                            "Id": {
+                                "Fn::Sub": "S3-${WebAppName}-green-${AWS::Region}-${AWS::AccountId}"
+                            },
+                            "S3OriginConfig": {
+                                "OriginAccessIdentity": {
+                                    "Fn::Sub": "origin-access-identity/cloudfront/${OriginAccessId}"
+                                }
+                            }
+                        },
+                        {
+                            "DomainName": {
+                                "Fn::GetAtt": [
+                                    "BlueBucket",
+                                    "DomainName"
+                                ]
+                            },
+                            "Id": {
+                                "Fn::Sub": "S3-${WebAppName}-blue-${AWS::Region}-${AWS::AccountId}"
+                            },
+                            "S3OriginConfig": {
+                                "OriginAccessIdentity": {
+                                    "Fn::Sub": "origin-access-identity/cloudfront/${OriginAccessId}"
+                                }
+                            }
+                        }
+                    ],
+                    "DefaultCacheBehavior": {
+                        "TargetOriginId": {
+                            "Fn::Sub": "S3-${WebAppName}-green-${AWS::Region}-${AWS::AccountId}"
+                        },
+                        "ViewerProtocolPolicy": "redirect-to-https",
+                        "ForwardedValues": {
+                            "QueryString": true
+                        },
+                        "MaxTTL": 3600,
+                        "SmoothStreaming": false,
+                        "DefaultTTL": 1,
+                        "AllowedMethods": [
+                            "HEAD",
+                            "DELETE",
+                            "POST",
+                            "GET",
+                            "OPTIONS",
+                            "PUT",
+                            "PATCH"
+                        ],
+                        "CachedMethods": [
+                            "HEAD",
+                            "GET"
+                        ],
+                        "MinTTL": 0,
+                        "Compress": true
+                    },
+                    "ViewerCertificate": {
+                        "SslSupportMethod": "sni-only",
+                        "AcmCertificateArn": {
+                            "Ref": "WebCert"
+                        }
+                    },
+                    "CustomErrorResponses": [
+                        {
+                            "ErrorCode": 403,
+                            "ResponsePagePath": "/index.html",
+                            "ResponseCode": 200,
+                            "ErrorCachingMinTTL": 5
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "DeploymentCloudType": {
+            "Description": "The name of the deployment chosen. Used to determine DNS",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:DeploymentCloudType"
+                }
+            },
+            "Value": {
+                "Ref": "DeploymentCloudType"
+            }
+        },
+        "WebAppName": {
+            "Description": "The name of the web app",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:WebAppName"
+                }
+            },
+            "Value": {
+                "Ref": "WebAppName"
+            }
+        },
+        "CertificateArn": {
+            "Description": "The ARN of the ACM certificate used for this deployment",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:CertificateArn"
+                }
+            },
+            "Value": {
+                "Ref": "WebCert"
+            }
+        },
+        "DeploymentBucket": {
+            "Description": "The name of the S3 Bucket created by this stack used for deployment",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:DeploymentBucketName"
+                }
+            },
+            "Value": {
+                "Ref": "DeploymentBucket"
+            }
+        },
+        "OriginAccessId": {
+            "Description": "The ID used for Origin Access Identity",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:OriginAccessId"
+                }
+            },
+            "Value": {
+                "Ref": "OriginAccessId"
+            }
+        },
+        "OriginCanonicalId": {
+            "Description": "The ID used for Origin Access Identity",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:OriginCanonicalId"
+                }
+            },
+            "Value": {
+                "Fn::GetAtt": [
+                    "OriginAccessId",
+                    "S3CanonicalUserId"
+                ]
+            }
+        },
+        "LiveCloudFrontId": {
+            "Description": "The CloudFront ID for Live use",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:LiveCloudFrontId"
+                }
+            },
+            "Value": {
+                "Ref": "LiveCloudFrontDistro"
+            }
+        },
+        "StagingCloudFrontId": {
+            "Description": "The CloudFront ID for Staging use",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:StagingCloudFrontId"
+                }
+            },
+            "Value": {
+                "Ref": "StagingCloudFrontDistro"
+            }
+        },
+        "LiveCloudFrontDomain": {
+            "Description": "The CloudFront ID for Live use",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:LiveCloudFrontDomain"
+                }
+            },
+            "Value": {
+                "Fn::GetAtt": [
+                    "LiveCloudFrontDistro",
+                    "DomainName"
+                ]
+            }
+        },
+        "StagingCloudFrontDomain": {
+            "Description": "The CloudFront ID for Staging use",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:StagingCloudFrontDomain"
+                }
+            },
+            "Value": {
+                "Fn::GetAtt": [
+                    "StagingCloudFrontDistro",
+                    "DomainName"
+                ]
+            }
+        },
+        "GreenS3OriginId": {
+            "Description": "The Origin ID for the Blue bucket",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:GreenS3OriginId"
+                }
+            },
+            "Value": {
+                "Fn::Sub": "S3-${WebAppName}-green-${AWS::Region}-${AWS::AccountId}"
+            }
+        },
+        "BlueS3OriginId": {
+            "Description": "The Origin ID for the Blue bucket",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:BlueS3OriginId"
+                }
+            },
+            "Value": {
+                "Fn::Sub": "S3-${WebAppName}-blue-${AWS::Region}-${AWS::AccountId}"
+            }
+        },
+        "GreenBucket": {
+            "Description": "The name of the GREEN s3 bucket",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:GreenBucket"
+                }
+            },
+            "Value": {
+                "Fn::Sub": "${WebAppName}-green-${AWS::Region}-${AWS::AccountId}"
+            }
+        },
+        "BlueBucket": {
+            "Description": "The name of the BLUE s3 bucket",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:BlueBucket"
+                }
+            },
+            "Value": {
+                "Fn::Sub": "${WebAppName}-blue-${AWS::Region}-${AWS::AccountId}"
+            }
+        },
+        "EdgeLambdaName": {
+            "Description": "The name of the Edge Lambda function",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:EdgeLambdaName"
+                }
+            },
+            "Value": {
+                "Fn::Sub": "platform-${WebAppName}-edge-lambda"
+            }
+        },
+        "EdgeLambdaArn": {
+            "Description": "The ARN of the Edge Lambda function",
+            "Export": {
+                "Name": {
+                    "Fn::Sub": "${AWS::StackName}:EdgeLambdaArn"
+                }
+            },
+            "Value": {
+                "Fn::GetAtt": [
+                    "EdgeLambda",
+                    "Arn"
+                ]
+            }
+        }
+    }
+}

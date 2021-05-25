@@ -2,11 +2,9 @@
   <div class="div-rows">
     <div class="t-Header-branding">
       <div class="t-Header-logo">
-        <span class="apex-logo-text">
-          <img class="img-block" src="assets/oracle-logo.png" alt="Oracle"> 
-          <span class="logo-name">India Dashboard</span>
-        </span>
+          <img class="img-block" src="assets/covid.png" alt="Oracle"> 
       </div>
+      <span class="logo-name">Covid-19 Dashboard</span>
       <i class="far fa-comment-alt" title="feedback" style="color:whitesmoke" (click)="commentOn()">
       </i>
     </div>
@@ -19,42 +17,37 @@
     <div class="container">
       <div class="row">
         <div class="row-1">
-          <label class="row-1 lb">Label Results Summary Page</label>
+          <label class="row-1 lb">Corona Worldwide Dashboard </label>
         </div>
         <div class="row-2"></div>
         <form #myform="ngForm" class="form form-login">
           <div class="nav-date">
-            <label class="date-label">Select Country</label>
-            <select id="myselectDates" class="date-opt">
-              <option value="lastSevenDays">India</option>
-              <option value="lastFifteenDays">USA</option>
-              <option value="TodaysDate">China</option>
-              <option value="lastThirtyDays">Korea</option>
+            <label class="date-label">Select Region</label>
+            <select (click)="onUpdateRegion()" id="myselectRegions" class="date-opt">
+              <option value="all">All</option> 
+              <option *ngFor="let reg of regionList" value="{{ reg }}">{{ reg }}</option>
             </select>
           </div>
-          <div class="nav-suite-type">
-            <label class="suitename-label">Select State</label>
-            <select (click)="selectSuiteType()" id="suiteType" class="name-opt">
-              <option value="none">Select</option>
-              <option value="sanity">Sanity Suite</option>
-              <option value="feature">Feature Suite</option>
-              <option value="all">All</option>
+          <div *ngIf="this.covidservice.regionalCountry" class="nav-suite-type">
+            <label class="suitename-label">Select Country</label>
+            <select (click)="selectCountry()" id="country" class="name-opt">
+              <option *ngFor="let con of this.covidservice.regionalCountry" value="{{ con.population }}">{{ con.name }}</option>
             </select>
           </div>
-          <div *ngIf="isJob" class="nav-suite">
-            <label class="suitename-label">Select Suite</label>
-            <select (click)="onSuiteChange()" id="myselectNames" class="name-opt">
-              <option *ngFor="let job of jobList" value="{{ job.job_val }}">{{ job.job_name }}</option>
-            </select>
+          <div *ngIf="!this.covidservice.regionalCountry" class="nav-suite">
+            <!-- <label class="suitename-label">Select State</label>
+            <select (click)="onSuiteChange()" id="myselectNames" class="name-opt"> -->
+              <!-- <option *ngFor="let job of jobList" value="{{ job.job_val }}">{{ job.job_name }}</option> -->
+            <!-- </select> -->
           </div>
           <div class="go-btn"> 
             <button type="button" id="eachSuiteResult" (click)="onSubmit()" name="go-btn">GO</button>
           </div>
         </form>
         <div class="row-5"></div>
-        <form *ngIf="ociuiservice.reportStatus && ociuiservice.avg_time" #mySuiteForm="ngForm" class="form form-login">
+        <form *ngIf="covidservice.reportStatus && covidservice.avg_time" #mySuiteForm="ngForm" class="form form-login">
           <label class="all-suites">NOTE: Click on stats button to get overall suite health stats.</label>
-          <button type="button" id="allSuiteResult" name="show-all"  *ngIf="ociuiservice.reportStatus" (click)="showStats()" class="show-all">OCI STATS</button>
+          <button type="button" id="allSuiteResult" name="show-all"  *ngIf="regionName" (click)="showStats()" class="show-all">OCI STATS</button>
         </form>
       </div>
     </div>
@@ -66,7 +59,7 @@
       </ul>  
     </div>
   </div>
-  <app-ociui-reports class="nav-report" *ngIf="isDate  && isSuite"></app-ociui-reports>
-  <app-ociui-stats class="nav-stats" *ngIf="ociuiservice.isStats || ociuiservice.isBuild"></app-ociui-stats>
+  <app-covid-reports class="nav-report" *ngIf="regionName"></app-covid-reports>
+  <!-- <app-covid-stats class="nav-stats" *ngIf="covidservice.isStats || covidservice.isBuild"></app-covid-stats> -->
   </div>
 </div> 

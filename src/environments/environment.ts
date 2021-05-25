@@ -6,10 +6,10 @@ export const environment = {
   production: true,
   firebaseConfig: {
     apiKey: "AIzaSyBXvJWQGwkRZ_vcroVzkAM2Xf6dP8jBr-E",
-    authDomain: "ociui-project.firebaseapp.com",
-    databaseURL: "https://ociui-project-default-rtdb.firebaseio.com",
-    projectId: "ociui-project",
-    storageBucket: "ociui-project.appspot.com",
+    authDomain: "covid-project.firebaseapp.com",
+    databaseURL: "https://covid-project-default-rtdb.firebaseio.com",
+    projectId: "covid-project",
+    storageBucket: "covid-project.appspot.com",
     messagingSenderId: "50106571788",
     appId: "1:50106571788:web:de643edbb3efe30c06a229",
     measurementId: "G-BNX9KF2PX2"

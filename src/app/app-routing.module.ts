@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { OciuiReportsComponent } from './ociui-reports/ociui-reports.component';
-import { OciuiStatsComponent } from './ociui-stats/ociui-stats.component';
+import { CovidReportsComponent } from './covid-reports/covid-reports.component';
+import { CovidStatsComponent } from './covid-stats/covid-stats.component';
 
 const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'reports', component: OciuiReportsComponent },
-  { path: 'stats', component: OciuiStatsComponent },
+  { path: 'reports', component: CovidReportsComponent },
+  { path: 'stats', component: CovidStatsComponent },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' }
 ];
 

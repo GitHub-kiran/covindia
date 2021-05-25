@@ -1,15 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ChartType, ChartOptions } from 'chart.js';
 import { SingleDataSet, Label, monkeyPatchChartJsLegend, monkeyPatchChartJsTooltip } from 'ng2-charts';
-import { OciuiServiceService } from '../ociui-service.service';
+import { CovidSeviceService } from '../covid-service.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 @Component({
-  selector: 'app-ociui-stats',
-  templateUrl: './ociui-stats.component.html',
-  styleUrls: ['./ociui-stats.component.scss']
+  selector: 'app-covid-stats',
+  templateUrl: './covid-stats.component.html',
+  styleUrls: ['./covid-stats.component.scss']
 })
-export class OciuiStatsComponent implements OnInit {
+export class CovidStatsComponent implements OnInit {
 
   public pieChartOptions: ChartOptions = {
     responsive: true,
@@ -18,7 +18,7 @@ export class OciuiStatsComponent implements OnInit {
   htmlString: any;
   http: HttpClient | undefined;
 
-  constructor(public ociuiservice: OciuiServiceService, private sanitizer: DomSanitizer, http: HttpClient) {
+  constructor(public covidservice: CovidSeviceService, private sanitizer: DomSanitizer, http: HttpClient) {
     monkeyPatchChartJsTooltip();   
     monkeyPatchChartJsLegend();
   }
@@ -40,9 +40,9 @@ export class OciuiStatsComponent implements OnInit {
     this.chartProp.yellow = "#FFFF00";
     this.loadStats();
     // this.someMethod();
-    // if(this.ociuiservice.isBuild && !this.ociuiservice.isStats)   {
-    //   // $("#build").load(this.ociuiservice.buildUrlHtml); 
-    //   window.location.href = this.ociuiservice.buildUrlHtml;
+    // if(this.covidservice.isBuild && !this.covidservice.isStats)   {
+    //   // $("#build").load(this.covidservice.buildUrlHtml); 
+    //   window.location.href = this.covidservice.buildUrlHtml;
     // }
 
   }
@@ -59,7 +59,7 @@ export class OciuiStatsComponent implements OnInit {
   //   const headers = new HttpHeaders({
   //   'Content-Type':  'text/plain',
   // });
-  // const request = this.http?.get<string>(this.ociuiservice.buildUrlHtml, {
+  // const request = this.http?.get<string>(this.covidservice.buildUrlHtml, {
   //   headers: headers,
   //   // responseType: 'text'
   // }).subscribe((res: any) => this.htmlString = res);
@@ -70,9 +70,9 @@ export class OciuiStatsComponent implements OnInit {
   // }
 
   loadStats() {
-    this.pieChartData[0] = this.ociuiservice.gDif;
-    this.pieChartData[1] = this.ociuiservice.gSuc;
-    this.pieChartData[2] = this.ociuiservice.gSkip;
+    this.pieChartData[0] = this.covidservice.gDif;
+    this.pieChartData[1] = this.covidservice.gSuc;
+    this.pieChartData[2] = this.covidservice.gSkip;
     this.pieChartColors[0].backgroundColor.push(this.chartProp?.red);
     this.pieChartColors[0].backgroundColor.push(this.chartProp?.green);
     this.pieChartColors[0].backgroundColor.push(this.chartProp?.yellow);

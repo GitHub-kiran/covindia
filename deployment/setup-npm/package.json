@@ -1,0 +1,16 @@
+{
+    "name": "setup-npm",
+    "version": "1.0.1",
+    "description": "Sets up the Mitel internal repository registry",
+    "main": "setup-npm.js",
+    "author": "james.renaud@mitel.com",
+    "license": "ISC",
+    "dependencies": {
+        "aws-sdk": "^2.113.0",
+        "command-line-args": "^4.0.7",
+        "npm-cli-login": "0.0.10"
+    },
+    "scripts": {
+        "setup-npm": "node setup-npm.js"
+    }
+}

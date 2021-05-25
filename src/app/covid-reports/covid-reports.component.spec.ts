@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OciuiStatsComponent } from './ociui-stats.component';
+import { CovidReportsComponent } from './covid-reports.component';
 
-describe('OciuiStatsComponent', () => {
-  let component: OciuiStatsComponent;
-  let fixture: ComponentFixture<OciuiStatsComponent>;
+describe('CovidReportsComponent', () => {
+  let component: CovidReportsComponent;
+  let fixture: ComponentFixture<CovidReportsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OciuiStatsComponent ]
+      declarations: [ CovidReportsComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OciuiStatsComponent);
+    fixture = TestBed.createComponent(CovidReportsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

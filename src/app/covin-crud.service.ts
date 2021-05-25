@@ -3,29 +3,29 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { CovidSeviceService } from './covid-service.service';
 
-// const baseURL = 'https://heroku-flask-app-16.herokuapp.com/';
 const baseURL = 'http://127.0.0.1:5000/';
 
 @Injectable({
   providedIn: 'root'
 })
-export class JenkinsCrudService {
+export class CovinCrudService {
+
   constructor(private httpClient: HttpClient, public covidservice: CovidSeviceService) { }
 
-  getJobNameList(): Observable<any> {
-    let path = baseURL + '/cov/';
+  getCountryList(): Observable<any> {
+    let path = baseURL + 'countries/';
     return this.httpClient.get(path);
   }
 
-  getParticularJobDetails(): Observable<any> {
-    let path = baseURL + '/';
+  getAllRegionData(): Observable<any> {
+    let path = baseURL + 'bulkData/';
     return this.httpClient.get(path);
-  }
+  } 
 
-  getAllJenkinsJobDetails(): Observable<any> {
-    let path = baseURL + 'get_all/';
-    console.log("under all......", path);
+  getCountryData(): Observable<any> {
+    console.log('under service....', this.covidservice.countryName);
+    let path = baseURL + '/' + this.covidservice.countryName + '/';
     return this.httpClient.get(path);
-  }
+  } 
 
 }

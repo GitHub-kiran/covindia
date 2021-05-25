@@ -1,0 +1,32 @@
+{
+  "name": "cloudlink-auth-portal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "config": {
+    "region": "us-east-1",
+    "cloud": "dev",
+    "awsrolearn": "arn:aws:iam::845624989343:role/Developer",
+    "awsprofile": "webapps-dev",
+    "awscfstackname": "platform-webapp-authportal",
+    "appname": "auth",
+    "appvanity": "auth",
+    "appdistfolder": "../dist",
+    "dontcache": "index.html"
+  },
+  "author": "james.renaud@mitel.com",
+  "license": "ISC",
+  "scripts": {
+    "predeployOnly": "npm version patch",
+    "deploy-code": "cross-env-shell deploy-webapp --region $npm_package_config_region --cloud-type $npm_package_config_cloud --deploy-type apponly --role-arn $npm_package_config_awsrolearn --stack-name $npm_package_config_awscfstackname --app-name $npm_package_config_appname --app-vanity $npm_package_config_appvanity --app-folder $npm_package_config_appdistfolder --profile $npm_package_config_awsprofile",
+    "deploy-stack": "cross-env-shell deploy-webapp --region $npm_package_config_region --cloud-type $npm_package_config_cloud --deploy-type stackonly --role-arn $npm_package_config_awsrolearn --stack-name $npm_package_config_awscfstackname --app-name $npm_package_config_appname --app-vanity $npm_package_config_appvanity --app-folder $npm_package_config_appdistfolder --profile $npm_package_config_awsprofile",
+    "deploy-full": "cross-env-shell deploy-webapp --region $npm_package_config_region  --cloud-type $npm_package_config_cloud --deploy-type full --role-arn $npm_package_config_awsrolearn --stack-name $npm_package_config_awscfstackname --app-name $npm_package_config_appname --app-vanity $npm_package_config_appvanity --app-folder $npm_package_config_appdistfolder --profile $npm_package_config_awsprofile",
+    "deploy": "npm run deploy-full",
+    "go-live": "cross-env-shell deploy-webapp --region $npm_package_config_region  --cloud-type $npm_package_config_cloud --deploy-type golive --role-arn $npm_package_config_awsrolearn --stack-name $npm_package_config_awscfstackname --app-name $npm_package_config_appname --app-vanity $npm_package_config_appvanity --app-folder $npm_package_config_appdistfolder --profile $npm_package_config_awsprofile",
+    "setup-npm": "cd setup-npm && npm run setup-npm"
+  },
+  "dependencies": {
+    "@mitel-internal/cloudlink-deployment": "^2.0.64",
+    "cross-env": "^5.1.4"
+  }
+}

@@ -1,0 +1,52 @@
+version: 0.2
+
+env:
+  variables:
+    CHROME_BIN: "/usr/bin/google-chrome"
+phases:
+  install:
+    commands:
+      - apt-get update
+      - npm install npm@latest -g
+      - echo Running NPM setup
+      - npm config set '@mitel:registry' https://depot.mitel.io/artifactory/api/npm/mitel/
+      - cd deployment/setup-npm
+      - npm ci
+      - npm run setup-npm -- --role-arn $paramRoleArn --region $AWS_REGION
+      - cd ../..
+      - echo Installing Chrome
+      - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+      - echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
+      - apt-get update
+      - apt-get -y install google-chrome-stable
+  pre_build:
+    commands:
+      - echo Installing packages for application
+      - cd src
+      - npm ci --unsafe-perm
+      - cd ..
+      - echo Installing packages for deployment
+      - cd deployment
+      - npm ci
+      - cd ..
+  build:
+    commands:
+      - cd src
+      - echo Starting app build process on `date`
+      - npm run build-$cloudType
+      - echo App build process completed on `date`
+      - echo Starting tests and coverage on `date`
+      - npm run test
+      - cd ..
+      - echo Starting deployment process on `date`
+      - cd deployment
+      - npm config set cloudlink-auth-portal:region $AWS_REGION
+      - npm config set cloudlink-auth-portal:cloud $cloudType
+      - npm config set cloudlink-auth-portal:awsrolearn $deployRoleArn
+      - npm config set cloudlink-auth-portal:awsprofile ''
+      - npm run deploy
+      - cd ..
+      - echo Build and Deployment completed on `date`
+artifacts:
+  files:
+    - ./dist/**/*

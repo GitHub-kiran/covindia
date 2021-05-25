@@ -1,6 +1,6 @@
 <div class="stats-container">
-  <!-- <div *ngIf="ociuiservice.isStats"> -->
-    <div *ngIf="ociuiservice.isStats" class="stats-container">
+  <!-- <div *ngIf="covidservice.isStats"> -->
+    <div *ngIf="covidservice.isStats" class="stats-container">
         <div class="oci-stats stats-container" style="display: block"> 
             <canvas baseChart 
               [data]="pieChartData" 
@@ -13,8 +13,8 @@
             </canvas>
           </div>
     </div>
-    <div *ngIf="ociuiservice.isBuild && !ociuiservice.isStats" ociuiBuild id="build" class="stats-container bld">
-      <!-- <iframe src="{{ociuiservice.buildUrlHtml}}"></iframe> -->
-      <!-- <div (include)="ociuiservice.buildUrlHtml"></div> -->
+    <div *ngIf="covidservice.isBuild && !covidservice.isStats" covidBuild id="build" class="stats-container bld">
+      <!-- <iframe src="{{covidservice.buildUrlHtml}}"></iframe> -->
+      <!-- <div (include)="covidservice.buildUrlHtml"></div> -->
     </div>
 </div>

@@ -1,7 +1,7 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import {Router} from '@angular/router';
-import { OciuiServiceService } from '../ociui-service.service';
-import { JenkinsCrudService } from '../jenkins-crud.service';
+import { CovidSeviceService } from '../covid-service.service';
+import { CovinCrudService } from '../covin-crud.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -9,34 +9,31 @@ import { JenkinsCrudService } from '../jenkins-crud.service';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
-  public isDate = "";
-  public isSuite: any = "";
-  public suiteType: any = "";
+  public regionName = "";
+  public regionList:string[] = [];
+  public countryName: any = "";
+  public country: any = "";
   public today = new Date();
   public isFeedback = false;
-  public myTextarea:string | undefined;
-  public isJob: boolean = false;
-  public jobList: any;
+  public Allcountries: any;
 
-  constructor(private router:Router, public ociuiservice: OciuiServiceService, 
-    public jenkinscrudeservice: JenkinsCrudService){
+  constructor(private router:Router, public covidservice: CovidSeviceService, 
+    public covincrudservice: CovinCrudService){
     } 
 
   ngOnInit() {
-      let job = sessionStorage.getItem('jobName');
-      this.getJobNameList();
+      this.getCountryNameList();
       setInterval(() => this.refreshData(), 60000);
 
   }
-  
-  getJobNameList() {
-    this.jenkinscrudeservice.getJobNameList()
+
+  getCountryNameList() {
+    this.covincrudservice.getCountryList()
     .subscribe(
       p => {
-        this.jobList = p;
-        console.log("job list are", this.jobList);
-        this.updateJobList();
-        this.formatJobNameList();
+        let d = p;
+        this.covidservice.setAllRegionalCountries(d.data);
+        this.getRegionalData();
       },
       error => {
         console.log(error);
@@ -44,22 +41,36 @@ export class DashboardComponent implements OnInit {
       
   }
 
-  updateJobList () {
-    if(this.ociuiservice.suiteType == 'sanity') {
-      this.jobList =this.jobList.sanity;
-    } else if (this.ociuiservice.suiteType == 'feature') {
-      this.jobList =this.jobList.feature;
-    } else {
-      this.jobList = '';
+  getRegionalData() {
+    console.log(this.covidservice.allRegionalCountry);
+    this.getRegionList();
+  }
+
+  getRegionalCountries() {
+    if(this.regionName && this.regionName != 'All') {
+      console.log("region is allllllll");
     }
   }
 
-  onSuiteChange() {
-    this.ociuiservice.reportStatus = false;
-    this.isSuite = "";
-    this.ociuiservice.isStats = false;
-    this.ociuiservice.avg_time = ''
+  getRegionList() {
+    let region = this.covidservice.allRegionalCountry;
+    this.regionList = Object.keys(region);
+  }
 
+  onSuiteChange() {
+    this.covidservice.reportStatus = false;
+    this.countryName = "";
+    this.covidservice.isStats = false;
+    this.covidservice.avg_time = ''
+
+  }
+
+  onUpdateRegion() {
+    let reg = $( "#myselectRegions option:selected" ).text();
+    if(reg && reg != 'All') {
+      var obj = this.covidservice.allRegionalCountry;
+      this.covidservice.setRegionalCountry(this.covidservice.allRegionalCountry[reg]);
+    }
   }
 
   @HostListener('window:click', ['$event.target'])
@@ -89,46 +100,35 @@ export class DashboardComponent implements OnInit {
   }
  
   showStats() {
-    this.isDate = $( "#myselectDates option:selected" ).text();
-    this.isSuite = $('#myselectNames option:selected').val();
-    let type = $('#suiteType').val();
-    this.isSuite = type == 'all'? type : this.isSuite;
-    this.ociuiservice.setDateRange(this.isDate);
-    this.ociuiservice.setSuiteName(this.isSuite);
-    this.ociuiservice.isStats = true;
-
+    this.regionName = $( "#myselectRegions option:selected" ).text();
+    this.countryName = $('#country').val();
+    this.covidservice.setRegion(this.regionName);
+    // this.covidservice.setCountryName(this.countryName);
+    this.covidservice.isStats = true;
   }
 
-  selectSuiteType() {
+  selectCountry() {
     this.onSuiteChange();
-    this.suiteType = $('#suiteType option:selected').val();
-    let k = $("#suiteType option:selected" ).val();
-    this.isJob = (k == 'none' || k == 'all')? false: true; 
-    this.ociuiservice.setSuiteType(this.suiteType);
-    this.isJob ? this.getJobNameList() : null;
+    // this.countryName = $('#country option:selected').text();
+    // console.log('my country name is: ', this.countryName);
+    // let population = $('#country').val();
+    // console.log('population is :', population);
+    // this.covidservice.setCountryName(this.countryName);
+    // this.covidservice.setPopulation(population);
+    
   }
 
-  formatJobNameList() {
-    // going to formate job name list
-    for(let i = 0; i<= this.jobList.length; i++) {
-      let job = this.jobList[i] != "undefined" ? this.jobList[i].job_name : null;
-      
-      if(job && job.split(' ')[0] == "Sanity"){
-        this.jobList[i].job_name = job.replace("Sanity", "");
-      } else if(job && job.split(' ')[0] == "Feature") {
-        this.jobList[i].job_name = job.replace("Feature", "").replace("ADW", "").replace("ATP", "");
-      }
-    }
-  }
-
-  onSubmit() {
-    this.isDate = $( "#myselectDates option:selected" ).text();
-    let type = $('#suiteType').val();
-    this.isSuite = $('#myselectNames').val(); 
-    this.isSuite = type == 'all'? type : this.isSuite;
-    this.ociuiservice.setDateRange(this.isDate);
-    this.ociuiservice.setSuiteName(this.isSuite);
-    this.ociuiservice.reportStatus = true;
+  onSubmit() { 
+    this.regionName = $( "#myselectRegions option:selected" ).text();
+    this.countryName = $('#country option:selected').text();
+    this.covidservice.setRegion(this.regionName);
+    this.covidservice.setCountryName(this.countryName);
+    let population = $('#country').val();
+    console.log('population is :', population);
+    this.covidservice.setCountryName(this.countryName);
+    this.covidservice.setPopulation(population);
+    
+    this.covidservice.reportStatus = true;
 
   }
 

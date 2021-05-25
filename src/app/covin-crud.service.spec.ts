@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { OciuiServiceService } from './ociui-service.service';
+import { CovinCrudService } from './covin-crud.service';
 
-describe('OciuiServiceService', () => {
-  let service: OciuiServiceService;
+describe('CovinCrudService', () => {
+  let service: CovinCrudService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(OciuiServiceService);
+    service = TestBed.inject(CovinCrudService);
   });
 
   it('should be created', () => {

@@ -3,10 +3,9 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class OciuiServiceService {
-  selectedDateRange!: string;
-  suiteName!: string;
-  suiteType = "sanity";
+export class CovidSeviceService {
+  selectedRegion!: string;
+  countryName!: string;
   gDif:number | undefined;
   gSuc:number | undefined;
   gSkip:number | undefined;
@@ -16,15 +15,22 @@ export class OciuiServiceService {
   singleJobReport: boolean = false;
   buildUrlHtml:string = '';
   isBuild:boolean = false;
+  allRegionalCountry : any = '';
+  regionalCountry : any = '';
+  population : String = '';
   
   constructor() { }
 
-  public setDateRange(dateRange: string) {
-    this.selectedDateRange = dateRange;
+  public setRegion(region: string) {
+    this.selectedRegion = region;
   }
 
-  public setSuiteName(suiteName: string) {
-    this.suiteName = suiteName;
+  public setCountryName(country: string) {
+    this.countryName = country;
+  }
+
+  public setPopulation(population: any) {
+    this.population = population;
   }
 
   public setTestStates(dif: number, suc:number, skip:number) {
@@ -38,8 +44,11 @@ export class OciuiServiceService {
 
   }
 
-  public setSuiteType(suiteType:any) {
-    this.suiteType = suiteType;
+  public setAllRegionalCountries(data: Object) {
+    this.allRegionalCountry = data;
+  }
 
+  public setRegionalCountry(data: Object) {
+    this.regionalCountry = data;
   }
 }

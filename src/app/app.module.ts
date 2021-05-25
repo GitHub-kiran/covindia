@@ -8,19 +8,19 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { environment } from '../environments/environment';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { OciuiReportsComponent } from './ociui-reports/ociui-reports.component';
-import { OciuiStatsComponent } from './ociui-stats/ociui-stats.component';
+import { CovidReportsComponent } from './covid-reports/covid-reports.component';
+import { CovidStatsComponent } from './covid-stats/covid-stats.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { OciuiBuildDirective } from './ociui-build.directive';
+import { CovidBuildDirective } from './covid-build.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
     DashboardComponent,
-    OciuiReportsComponent,
-    OciuiStatsComponent,
-    OciuiBuildDirective
+    CovidReportsComponent,
+    CovidStatsComponent,
+    CovidBuildDirective
   ],
   imports: [
     BrowserModule,
